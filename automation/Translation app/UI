@@ -1,0 +1,18 @@
+import streamlit as st
+import requests
+st.title("Translation App")
+text = st.text_area("Write something in english")
+telugu = st.button("Telugu")
+hindi = st.button("Hindi")
+url = "https://tejatemp1.app.n8n.cloud/webhook/d066aa84-b262-47b7-a711-54f1cc8b802b"
+if telugu or hindi:
+    if telugu == True:
+        language = "telugu_language"
+    else:
+        language = "hindi_language"
+    if text:
+        response = requests.post(url=url,json={"input":text,"language":language})
+        if response.status_code == 200:
+            st.write(response.json()[0]["output"])
+        else:
+            st.write("Try again after some time")
