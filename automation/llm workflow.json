@@ -1,0 +1,489 @@
+{
+  "name": "llm workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weeksInterval": 2,
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        -160
+      ],
+      "id": "d06bf0e9-eb1f-4c79-b526-1bcd2676119c",
+      "name": "Every 2 week"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JAZB2jDQLLMsf4ur8mvNnF50aJ1eBPXDuqRavS9RxO8",
+          "mode": "list",
+          "cachedResultName": "Student Details(joined)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JAZB2jDQLLMsf4ur8mvNnF50aJ1eBPXDuqRavS9RxO8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JAZB2jDQLLMsf4ur8mvNnF50aJ1eBPXDuqRavS9RxO8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -208,
+        -160
+      ],
+      "id": "c3551e17-65cd-4491-94e4-2c61f3c5a042",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "l7Ow8Yv6KSSoZNtd",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.EmailId }}",
+        "subject": "Feedback Form",
+        "emailType": "text",
+        "message": "=Hi  {{ $json.Name }},Please fill the feedback form \n\nlink:https://forms.gle/Vt17pKToYJd82aNz8\n\nThank You\nManager",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -160
+      ],
+      "id": "8fcab7fc-5950-471a-8752-9f1710787441",
+      "name": "Send a message",
+      "webhookId": "ff430645-d6d0-4b22-bf79-3032605469f7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7J7u93Os4pAvCTDg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## First Workflow which send a feedback form for every 2 week"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -784,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "b8c5b04d-4297-42cd-875a-36cb787532c8",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1YA1xqEOwhRkeTiy7NSMBg7jzH3Bf8vnkkAKtqYA_bEo",
+          "mode": "list",
+          "cachedResultName": "Feedback Form (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YA1xqEOwhRkeTiy7NSMBg7jzH3Bf8vnkkAKtqYA_bEo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1937502227,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YA1xqEOwhRkeTiy7NSMBg7jzH3Bf8vnkkAKtqYA_bEo/edit#gid=1937502227"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        144
+      ],
+      "id": "073c9efb-9e66-4707-9942-508911c96820",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "YAUqLN4rbPx3V3DC",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.Review }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "typeVersion": 1.1,
+      "position": [
+        -496,
+        144
+      ],
+      "id": "8e881af2-2ef4-4fa2-9b08-0e1900fc5201",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        384
+      ],
+      "id": "cdd3225c-d7da-48fb-a7c7-c0ba441e9dbc",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4ZN03JNxXSwdRavc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['Email Address'] }}",
+        "subject": "Response",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        176
+      ],
+      "id": "a704a73d-8ca8-439f-b120-26b311051946",
+      "name": "Send a message1",
+      "webhookId": "9421596f-7d33-49ed-b5b1-1a76d7020255",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7J7u93Os4pAvCTDg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['Email Address'] }}",
+        "subject": "Response",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        416
+      ],
+      "id": "bcbe89ff-5471-46a5-b185-1a60928ea85d",
+      "name": "Send a message2",
+      "webhookId": "9421596f-7d33-49ed-b5b1-1a76d7020255",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7J7u93Os4pAvCTDg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['Email Address'] }}",
+        "subject": "Response",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        -64
+      ],
+      "id": "5d007241-84bc-4c50-86d7-4dcf3c5ffdc4",
+      "name": "Send a message3",
+      "webhookId": "9421596f-7d33-49ed-b5b1-1a76d7020255",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7J7u93Os4pAvCTDg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an assistant that writes professional and empathetic emails.  \nYou will receive a customer review and its sentiment (positive, negative, or neutral).  \nBased on that, generate an appropriate email response.\n\n### Input:\nReview: {{ $json.Review }}\nSentiment: {{ $json.sentimentAnalysis.category }}\n\n### Instructions:\n- If the sentiment is **positive**: Thank the customer and appreciate their feedback.  \n- If the sentiment is **negative**: Apologize sincerely, acknowledge the issue, and assure resolution or follow-up.  \n- If the sentiment is **neutral**: Politely thank them for their feedback and invite suggestions for improvement.  \n- Keep the tone polite, human-like, and under 100 words.  \n- Include a simple subject line.\n\n### Output Format:\nSubject: <email subject>\nBody: <email body>\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        208,
+        -64
+      ],
+      "id": "8684aa49-a298-46d9-a736-256fc8cb7e94",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        304,
+        64
+      ],
+      "id": "fe788e32-8f1f-4d17-8624-93ce05654cc9",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4ZN03JNxXSwdRavc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an assistant that writes professional and empathetic emails.  \nYou will receive a customer review and its sentiment (positive, negative, or neutral).  \nBased on that, generate an appropriate email response.\n\n### Input:\nReview: {{ $json.Review }}\nSentiment: {{ $json.sentimentAnalysis.category }}\n\n### Instructions:\n- If the sentiment is **positive**: Thank the customer and appreciate their feedback.  \n- If the sentiment is **negative**: Apologize sincerely, acknowledge the issue, and assure resolution or follow-up.  \n- If the sentiment is **neutral**: Politely thank them for their feedback and invite suggestions for improvement.  \n- Keep the tone polite, human-like, and under 100 words.  \n- Include a simple subject line.\n\n### Output Format:\nSubject: <email subject>\nBody: <email body>\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        16,
+        160
+      ],
+      "id": "a2187ffd-eb55-41af-8725-23e807060026",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        112,
+        304
+      ],
+      "id": "30975f75-1a20-483b-af3f-f2fe0320e928",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4ZN03JNxXSwdRavc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an assistant that writes professional and empathetic emails.  \nYou will receive a customer review and its sentiment (positive, negative, or neutral).  \nBased on that, generate an appropriate email response.\n\n### Input:\nReview: {{$json[\"review\"]}}\nSentiment: {{$json[\"sentiment\"]}}\n\n### Instructions:\n- If the sentiment is **positive**: Thank the customer and appreciate their feedback.  \n- If the sentiment is **negative**: Apologize sincerely, acknowledge the issue, and assure resolution or follow-up.  \n- If the sentiment is **neutral**: Politely thank them for their feedback and invite suggestions for improvement.  \n- Keep the tone polite, human-like, and under 100 words.  \n- Include a simple subject line.\n\n### Output Format:\nSubject: <email subject>\nBody: <email body>\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -64,
+        448
+      ],
+      "id": "d3abfaf2-957f-47e8-98b8-e5a68e4052b4",
+      "name": "Basic LLM Chain2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        32,
+        592
+      ],
+      "id": "2fd4bbd4-e274-4a81-8fda-5e7d8cb8859b",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4ZN03JNxXSwdRavc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Every 2 week": {
+      "main": [
+        []
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain2": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c7069a2c-6e41-405d-b85c-28011c58d7a4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "38c8fe0ca90e14ca43d751da199c97ff123f3e85f00b88fff4a53b4359f931ae"
+  },
+  "id": "W159N8azYoB8L1Zz",
+  "tags": []
+}

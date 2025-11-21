@@ -1,0 +1,234 @@
+{
+  "name": "inno mentor",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -736,
+        -32
+      ],
+      "id": "9da311db-9a50-4a0a-abbe-44d5367d0f75",
+      "name": "Telegram Trigger",
+      "webhookId": "e2315850-1288-480e-b3ff-3e5433ad607c",
+      "credentials": {
+        "telegramApi": {
+          "id": "UFZFOGt6MuXU6imq",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI Mentor Chatbot for students on Telegram.  \nYour role is to guide students with their technical doubts. \n\n\n### Your Responsibilities:\n1. When a student says “hi”, “hello”, “hey”, or any greeting:\n   - Respond with a friendly welcome.\n   - Ask them to choose a topic:\n     “Python”, “EDA”, “Machine Learning”, or “Deep Learning”.\n\n2. When the student selects a topic:\n   - Acknowledge their choice.\n   - Store this topic for the rest of the conversation.\n   - Ask them to describe their technical doubt in that topic.\n\n3. When the student sends a doubt:\n   - Clearly understand the question.\n   - Generate a simple, clear, step-by-step explanation.\n   - Avoid overly complex terms unless needed.\n   - If code is required, provide clean and correct examples.\n\n4. Always respond in a supportive, encouraging, and easy style.\n   Example:  \n   “Sure! Let me break it down step by step…”\n\n5. You must always remain active 24/7 and answer every message.\n\n### Conversation Memory Instructions:\n- Remember only the selected topic for the ongoing chat.\n- Once a new chat starts, do NOT remember past topics.\n\n### Output Format:\nAlways respond with:\n- A friendly message\n- Step-by-step explanation\n- Code example if useful\n- Follow-up question like: “Would you like more help?”\nBased on below text:\n {{ $json.message.text }} respond in upto 100 tokens\nStart Responding Now",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -352,
+        -32
+      ],
+      "id": "a7b7853f-a40d-4528-a0a3-89080a63e153",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        176
+      ],
+      "id": "555af39a-65c8-4723-b5bb-9c5b38c86916",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4ZN03JNxXSwdRavc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        160
+      ],
+      "id": "181f8a33-fd42-431a-b30e-4d77df3a9c68",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        32,
+        -32
+      ],
+      "id": "b68d8fe1-9425-46cc-b3fb-80e2cd6d3de7",
+      "name": "Send a text message",
+      "webhookId": "c10d4839-bb4b-490b-b237-dbbfbf332dec",
+      "credentials": {
+        "telegramApi": {
+          "id": "UFZFOGt6MuXU6imq",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2df0370a-d282-4670-9798-d2ec8c80b45e",
+              "leftValue": "={{ $json.message.chat.id }}",
+              "rightValue": 2032200854,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -560,
+        -32
+      ],
+      "id": "fcf01dd0-0f11-4b3f-81fb-c4ec07006753",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Need to be a member of Innomatics to use the bot for more information contact Innomatics @gmail.com\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -624,
+        192
+      ],
+      "id": "9ce6b23e-a5e4-4e37-80f7-5187e81260fd",
+      "name": "Send a text message1",
+      "webhookId": "c10d4839-bb4b-490b-b237-dbbfbf332dec",
+      "credentials": {
+        "telegramApi": {
+          "id": "UFZFOGt6MuXU6imq",
+          "name": "Telegram account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3536e3a2-1acf-4ba8-ae79-f2b2772b67db",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "38c8fe0ca90e14ca43d751da199c97ff123f3e85f00b88fff4a53b4359f931ae"
+  },
+  "id": "x6SDLoYIpgWXJ2fK",
+  "tags": []
+}

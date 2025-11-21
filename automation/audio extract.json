@@ -1,0 +1,209 @@
+{
+  "name": "audio extract",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -192,
+        -16
+      ],
+      "id": "e3bf0a86-c502-4a37-9e75-9bec30351294",
+      "name": "Telegram Trigger",
+      "webhookId": "7766084b-1a13-4760-8a12-fd34a5f89c01",
+      "credentials": {
+        "telegramApi": {
+          "id": "UFZFOGt6MuXU6imq",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        -16
+      ],
+      "id": "57951549-7815-4e08-a4be-537895e77170",
+      "name": "Get a file",
+      "webhookId": "d6a3362f-98f9-43c2-8e64-838e7b156f80",
+      "credentials": {
+        "telegramApi": {
+          "id": "UFZFOGt6MuXU6imq",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -16
+      ],
+      "id": "14f5bbb1-d7a5-41f4-8735-2165d8faf4d4",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4ZN03JNxXSwdRavc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "options": {
+          "systemMessage": ""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        432,
+        -16
+      ],
+      "id": "29c1ecdf-c5c9-4b7c-aa71-53417bbbc848",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        416,
+        160
+      ],
+      "id": "ccb66c4d-2ae2-4227-91a4-d7eed2ee53f6",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4ZN03JNxXSwdRavc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        592,
+        192
+      ],
+      "id": "5a507be3-53c8-42c6-96c8-90c740fd4f6f",
+      "name": "Send a message in Gmail",
+      "webhookId": "fb869868-1dd3-4062-b365-b00f5df86e2d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7J7u93Os4pAvCTDg",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "099739a1-2460-49b6-a6a1-dc97c998c6c1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "38c8fe0ca90e14ca43d751da199c97ff123f3e85f00b88fff4a53b4359f931ae"
+  },
+  "id": "4qIHzwf6o0buaY0L",
+  "tags": []
+}

@@ -1,0 +1,130 @@
+{
+  "name": "tools",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is bot. How can I assist you today?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "8677be4a-5388-4fd1-bcf9-f51bb8b674a7",
+      "name": "When chat message received",
+      "webhookId": "12952ed4-1cff-465e-83a1-294fa8805d28"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a mail based on the below information \ninput:{{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are a good assisstant who will write a mail based on the input,\n\n\nfor writing the mail please use the tool which is provided to you"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "9423a97d-4eef-4f28-a085-24d12385b8f4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        144
+      ],
+      "id": "f3a8e1f0-fe8f-4ec9-b62d-dbc4b395ff2c",
+      "name": "Send a message in Gmail",
+      "webhookId": "c3f863aa-1698-49ff-9c2e-6ceb37f24797",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7J7u93Os4pAvCTDg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        192
+      ],
+      "id": "5acf8469-1967-4b08-a6a5-8d1c283956c1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4ZN03JNxXSwdRavc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "703c58f1-1793-4396-af76-b05dc0febdc8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "38c8fe0ca90e14ca43d751da199c97ff123f3e85f00b88fff4a53b4359f931ae"
+  },
+  "id": "QOKDvOn70Zi7ADwH",
+  "tags": []
+}
